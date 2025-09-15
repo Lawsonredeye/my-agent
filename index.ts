@@ -1,7 +1,7 @@
 import { stepCountIs, streamText } from "ai";
 import { google } from "@ai-sdk/google";
 import { SYSTEM_PROMPT } from "./prompts";
-import { getFileChangesInDirectoryTool } from "./tools";
+import { getGitDiffTool, getFileChangesInDirectoryTool } from "./tools";
 
 const codeReviewAgent = async (prompt: string) => {
   const result = streamText({
@@ -10,6 +10,7 @@ const codeReviewAgent = async (prompt: string) => {
     system: SYSTEM_PROMPT,
     tools: {
       getFileChangesInDirectoryTool,
+      getGitDiffTool,
     },
     stopWhen: stepCountIs(10),
   });
@@ -20,5 +21,5 @@ const codeReviewAgent = async (prompt: string) => {
 };
 
 await codeReviewAgent(
-  "Review the code changes made in '../my-agent' directory, make your reviews and suggestions file by file",
+  "Review the code changes made in '../my-agent' directory, make your reviews and suggestions file by file and then when youre done, create a commit message for the changes made",
 );

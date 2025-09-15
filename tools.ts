@@ -28,3 +28,17 @@ export const getFileChangesInDirectoryTool = tool({
   inputSchema: fileChange,
   execute: getFileChangesInDirectory,
 });
+
+async function getGitDiff({ rootDir }: FileChange) {
+  const git = simpleGit(rootDir);
+  const diff = await git.diff();
+
+  return diff;
+}
+
+export const getGitDiffTool = tool({
+  description:
+    "Helps in getting the difference made in a given project directory",
+  inputSchema: fileChange,
+  execute: getGitDiff,
+});
