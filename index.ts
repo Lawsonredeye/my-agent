@@ -1,10 +1,24 @@
-import { generateText } from "ai";
+import { stepCountIs, streamText } from "ai";
 import { google } from "@ai-sdk/google";
+import { SYSTEM_PROMPT } from "./prompts";
+import { getFileChangesInDirectoryTool } from "./tools";
 
-const { text } = await generateText({
-  model: google("gemini-2.5-flash"),
-  prompt:
-    "Say that famous line that was said in **Taken** by Liam Neeson when they took his daughter",
-});
+const codeReviewAgent = async (prompt: string) => {
+  const result = streamText({
+    model: google("gemini-2.5-flash"),
+    prompt,
+    system: SYSTEM_PROMPT,
+    tools: {
+      getFileChangesInDirectoryTool,
+    },
+    stopWhen: stepCountIs(10),
+  });
 
-console.log(text);
+  for await (const chunk of result.textStream) {
+    process.stdout.write(chunk);
+  }
+};
+
+await codeReviewAgent(
+  "Review the code changes made in '../my-agent' directory, make your reviews and suggestions file by file",
+);
